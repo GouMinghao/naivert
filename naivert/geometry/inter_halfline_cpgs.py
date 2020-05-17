@@ -24,7 +24,9 @@ def inter_halfline_cpgs(hl,cpgs):
         if inter_pt is not None:
             if isinstance(inter_pt,Point):
                 dist = distance(inter_pt,hl.point)
-                if  dist < lease_distance:
+                if  dist < least_distance:
                     least_distance = dist
                     first_point = inter_pt
-    return first,inter_pt
+    return first_point,least_distance
+
+__all__ = ('inter_halfline_cpgs',)
