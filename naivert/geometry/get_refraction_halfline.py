@@ -36,3 +36,5 @@ def get_refraction_halfline(in_hl,in_n,out_n,cpg):
         out_vec = tan_vec.normalized() * sin_theta_output + normal.normalized() * math.cos(theta_out)
     # out_vec = 2 * tan_vec - in_vec
     return HalfLine(out_hl_point,out_vec)
+
+__all__ = ('get_refraction_halfline',)

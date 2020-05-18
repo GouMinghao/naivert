@@ -25,4 +25,5 @@ def get_reflection_halfline(in_hl,cpg):
     tan_vec = get_tangential_vector(in_vec,normal)
     out_vec = 2 * tan_vec - in_vec
     return HalfLine(out_hl_point,out_vec)
-    
+
+__all__ = ('get_reflection_halfline',)
