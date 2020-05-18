@@ -24,4 +24,7 @@ class Scene(object):
     def add_camera(self,camera):
         self.camera_list.append(camera)
 
+    def render_scene(self):
+        for camera in self.camera_list:
+            ren_camera
         
