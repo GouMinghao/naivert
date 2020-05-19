@@ -62,8 +62,8 @@ class Camera(object):
         """
         width = self.resolution[0]
         height = self.resolution[1]
-        x_step_vec = self.y_vec / width # be careful here, don't confuse the x and y
-        y_step_vec = self.x_vec / height # be careful here, don't confuse the x and y
+        x_step_vec = self.y_vec * (1/width) # be careful here, don't confuse the x and y
+        y_step_vec = self.x_vec * (1/height) # be careful here, don't confuse the x and y
         p = copy.deepcopy(self.main_point).move(x_step_vec * (-width / 2 + x + 0.5)).move(y_step_vec * (-height / 2 + y + 0.5))
         return HalfLine(self.focus_point,p)
 
@@ -103,8 +103,9 @@ def ren_camera(camera,face_list,light_list):
 
     - light_list: a list of Light of the scene
     """
-    for x,y in itertools.product(range(camera.resolution[0]),range(camera.resolition[1])):
+    for x,y in itertools.product(range(camera.resolution[0]),range(camera.resolution[1])):
         primary_halfline = camera.primary_halfline(x,y)
+        print(primary_halfline)
         ray_list = []
         trace_ray(primary_halfline,[],ray_list,face_list,light_list,depth = get_rt_max_depth(),n = 1)
         camera.image[x][y] = cal_ray(ray_list)

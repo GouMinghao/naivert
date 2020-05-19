@@ -12,4 +12,9 @@ def set_rt_max_depth(max_depth):
 
 NO_LOSS = np.array([1,1,1],dtype=np.float32)
 
-__all__=('get_rt_max_depth','set_rt_max_depth')
+BLUE=[1.0,0.0,0.0]
+GREEN=[0.0,1.0,0.0]
+RED=[0.0,0.0,1.0]
+WHITE=[1.0,1.0,1.0]
+
+__all__=('get_rt_max_depth','set_rt_max_depth','BLUE','GREEN','RED','WHITE')

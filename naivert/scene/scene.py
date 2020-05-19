@@ -75,5 +75,7 @@ class Scene(object):
         '''        
         for camera in self.camera_list:
             camera.write_image()
-        
+
+    def __repr__(self):
+        return 'Scene contains {} light, {} camera and {} faces'.format(len(self.light_list),len(self.camera_list),len(self.face_list))
 
