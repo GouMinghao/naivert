@@ -1,4 +1,4 @@
-from Geometry3D import Vector,orthogonal
+from Geometry3D import Vector,orthogonal,distance
 import numpy as np
 import cv2
 import itertools
@@ -12,10 +12,10 @@ from ..utils.constant import get_rt_max_depth,NO_LOSS
 from ..light import AmbientLight, PointLight
 
 class Camera(object):
-    '''
+    """
     Camera class.
 
-    ** Input: **
+    **Input:**
 
     - focus_point: a Geometry3D.Point of the focus point
 
@@ -26,7 +26,7 @@ class Camera(object):
     - y_vec: a Geometry3D.Vector of the y_vector of the camera
 
     - resolution: a tuple of int of the resolution
-    '''
+    """
 
     def __init__(self,focus_point,main_point,x_vec,y_vec,image_path=None,resolution=(640,480)):
         self.focus_point = focus_point
@@ -45,45 +45,59 @@ class Camera(object):
             raise ValueError('y_vec and z_vec are not orthogonal')
 
     def primary_halfline(self,x,y):
-        '''
+        """
         **Input:**
 
         - x: int of the index of the array.
 
         - y: int of the index of the array.
-    'Material',
+
         **Output:**
 
         - Geometry3D.HalfLine of the primary ray of the (x,y) pixel.
         
-        ** Illustration: **
+        **Illustration:**
 
         - The figure is given in the root folder/camera.png
-        ''' 
-        # needs to be implemented.
+        """ 
+        
 
     def set_image_path(self,image_path):
+        """
+        **Input:**
+        image_path: the string of the path of the image that will be saved
+        """
         self.image_path = image_path
     
     def write_image(self):
+        """
+        **Function:**
+        
+        - Write the image to the file
+        """ 
         import cv2
         if self.image_path is None:
             raise ValueError('Image path not set for this camera')
         cv2.imwrite(self.image_path,self.image)
 
     def unify_intensity(self):
+        """
+        **Function:**
+        
+        - Unify the intensity of the image to [0,1]
+        """
         self.image = self.image / (max(self.image))
 
 def ren_camera(camera,face_list,light_list):
-    '''
-    ** Input: **
+    """
+    **Input:**
     
     - camera: Camera of the camera that want to render
 
     - face_list: a list of Faces of a scene
 
     - light_list: a list of Light of the scene
-    '''
+    """
     for x,y in itertools.product(range(camera.resolution[0]),range(camera.resolition[1])):
         primary_halfline = camera.primary_halfline(x,y)
         ray_list = []
@@ -93,7 +107,7 @@ def ren_camera(camera,face_list,light_list):
 
 
 def trace_ray(halfline,trace_list,ray_list,face_list,light_list,depth,n=1):
-    '''
+    """
     **Input:**
     
     - halfline: Geometry3D.HalfLine of the input HalfLine
@@ -107,7 +121,7 @@ def trace_ray(halfline,trace_list,ray_list,face_list,light_list,depth,n=1):
     - depth: the transformation depth remained
 
     - n: a float of the refraction rate of the input material
-    '''
+    """
     if depth == 0:
         return
     inter_point,d,face = inter_halfline_face_list(halfline,face_list)
@@ -128,7 +142,7 @@ def trace_ray(halfline,trace_list,ray_list,face_list,light_list,depth,n=1):
         # light
         for light in light_list:
             if isinstance(light,AmbientLight):
-                ray_list.append(copy.deepcopy(trace_list).append(face.material.ka).append(light))
+                ray_list.append(copy.deepcopy(trace_list)+[d,face.material.ka,light])
             elif isinstance(light,PointLight):
                 L_vec = Vector(inter_point,light.pos).normalized()
                 N_vec = face.cpg.plane.n.normalized()
@@ -139,14 +153,39 @@ def trace_ray(halfline,trace_list,ray_list,face_list,light_list,depth,n=1):
                 for i in range(3):
                     i_s[i] = face.material.ks[i] * math.pow(R_vec * V_vec,face.material.alpha)
                 i_d = face.material.kd * (L_vec * N_vec)
-                ray_list.append(copy.deepcopy(trace_list).append(d).append(i_s+ i_d).append(light))
-                # ray_list type 1: [... k, distance, i_s + i_d,  point light]
-                # ray_list type 2: [... k, ks, ambient light]
+                d_light = distance(inter_point,light.pos)
+                ray_list.append(copy.deepcopy(trace_list)+[d,i_s+ i_d+d_light+light])
+                # ray_list type 1: [... k, distance, i_s + i_d, distance, point light]
+                # ray_list type 2: [... k, distance, ks, ambient light]
             else:
                 raise TypeError('Unknown Light Type:{}'.format(type(light)))
 
 def cal_ray(ray_list):
-    return np.array([0,0,0],dtype=np.uint8)
-    # needs to be implemented.
+    """
+    **Input:**
+
+    - ray_list: a list of ray list
+
+    **Output:**
+
+    -  the sum intensity of all the rays
+    """
+    intensity = np.zeros(3,dtype = np.float32)
+    for ray in ray_list:
+        total_d = 0
+        ray_intensity = np.array(ray[-1].rgb)
+        for k in reversed(ray[:-1]):
+            if isinstance(k,np.ndarray):
+                ray_intensity *= k
+            else: #distance
+                if total_d == 0:
+                    ray_intensity *= 1 / math.pow(k,2)
+                    total_d = k 
+                else:
+                    ray_intensity += math.pow(total_d,2) / math.pow(total_d + k,2)
+                    total_d += k
+        intensity += ray_intensity
+    return intensity
+    
 
 __all__=('Camera','ren_camera')

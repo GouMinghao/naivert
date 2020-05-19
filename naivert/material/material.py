@@ -1,8 +1,8 @@
 import numpy as np
 class Material(object):
-    '''Class Maririal
+    """Class Matirial
 
-    ** Input: **
+    **Input:**
 
     - n: float for refraction rate
     
@@ -17,7 +17,7 @@ class Material(object):
     - ka: list of three float of the ambient light coefficient
 
     - alpha: gloss constant
-    '''
+    """
     
     @classmethod
     def Glass(cls):
@@ -79,7 +79,17 @@ class Material(object):
             alpha = 2
             )
 
-
+    @classmethod
+    def SpecularMaterial_White_1(cls):
+        return cls(
+            n = 1,
+            f_reflect=np.array([0.7,0.7,0.7]),
+            f_refract=np.array([0.,0.,0.]),
+            ks = np.array([0.95,0.95,0.95]),
+            kd = np.array([0.02,0.02,0.02]),
+            ka = np.array([0,0,0]),
+            alpha = 10
+            )
 
     def __init__(self,n,f_reflect,f_refract,ks,kd,ka,alpha):
         self.n = n
@@ -89,5 +99,6 @@ class Material(object):
         self.kd = kd
         self.ka = ka
         self.alpha = alpha
+
 
 __all__ = ('Material',)

@@ -2,8 +2,8 @@ from Geometry3D import HalfLine, Point,angle, intersection, get_eps
 from .get_tangential_vector import get_tangential_vector
 import math
 def get_refraction_halfline(in_hl,in_n,out_n,cpg):
-    '''
-    ** Input: **
+    """
+    **Input:**
 
     - in_hl: Geometry3D.HalfLine of input half line.
 
@@ -13,10 +13,10 @@ def get_refraction_halfline(in_hl,in_n,out_n,cpg):
 
     - cpg: Geometry3D.ConvexPolygen of the intersection convex polygen
 
-    ** Output: **
+    **Output:**
 
     - out_hl: Geometry3D.HalfLine of output half line.
-    '''
+    """
     out_hl_point = intersection(in_hl,cpg)
     if out_hl_point is None:
         return None

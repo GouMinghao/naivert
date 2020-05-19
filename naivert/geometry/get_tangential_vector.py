@@ -1,17 +1,17 @@
 
 from Geometry3D import Vector,angle,get_eps
 def get_tangential_vector(in_vec,n):
-    '''
-    ** Input: **
+    """
+    **Input:**
 
     - in_vec: Geometry3D.Vector
     
     - n: Geometry3D.Vector and n * in_vec > 0
 
-    ** Output: **
+    **Output:**
 
     - tan_vec: Geometry3D.Vector of the tangential vector
-    '''
+    """
     assert in_vec * n > get_eps()
     norm_n = n.normalized()
     norm_length = in_vec * norm_n

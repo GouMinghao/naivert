@@ -2,17 +2,17 @@ from Geometry3D import HalfLine, Point,intersection
 from .get_tangential_vector import get_tangential_vector
 
 def get_reflection_halfline(in_hl,cpg):
-    '''
-    ** Input: **
+    """
+    **Input:**
 
     - in_hl: Geometry3D.HalfLine of input half line.
 
     - cpg: Geometry3D.ConvexPolygen of the intersection convex polygen
 
-    ** Output: **
+    **Output:**
 
     - out_hl: Geometry3D.HalfLine of output half line.
-    '''
+    """
     out_hl_point = intersection(in_hl,cpg)
     if out_hl_point is None:
         return None

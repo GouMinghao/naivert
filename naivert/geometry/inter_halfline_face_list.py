@@ -2,8 +2,8 @@ import math
 from Geometry3D import Point, intersection, distance
 
 def inter_halfline_face_list(hl,face_list):
-    '''
-    ** Input: **
+    """
+    **Input:**
     
     - hl: Geomrtry3D.HalfLine
 
@@ -18,7 +18,7 @@ def inter_halfline_face_list(hl,face_list):
     - distance: float of the distance between the intersection point and the start point of half line.
     
     - inter_face: the intersection Face
-    '''
+    """
     first_point = None
     least_distance = math.inf
     inter_face = None
