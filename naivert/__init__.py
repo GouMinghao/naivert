@@ -1,7 +1,7 @@
 from .geometry import *
 from .material import Material
 from .camera import Camera
-from .light import PointLight
+from .light import PointLight,AmbientLight
 from .scene import Scene
 
 __all__ = (
@@ -14,5 +14,6 @@ __all__ = (
     'Camera',
     'Light',
     'PointLight',
+    'AmbientLight',
     'Scene',
 )

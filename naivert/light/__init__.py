@@ -1,3 +1,3 @@
-from .light import Light,PointLight
+from .light import Light,PointLight,AmbientLight
 
-__all__ = ('PointLight','Light',)
+__all__ = ('PointLight','Light','AmbientLight')

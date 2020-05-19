@@ -20,4 +20,15 @@ class PointLight(Light):
         self.pos = pos
         self.rgb = copy.deepcopy(rgb)
 
-__all__ = ('Light','PointLight',)
+class AmbientLight(Light):
+    '''
+    Ambient light source class
+
+    ** Input: **
+
+    - rgb: list of rgb light strength
+    '''
+    def __init__(self,rgb):
+        self.rgb = copy.deepcopy(rgb)
+
+__all__ = ('Light','PointLight','AmbientLight')

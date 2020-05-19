@@ -5,10 +5,6 @@ from ..geometry.face import Face
 
 import itertools
 
-# def ren_camera(camera,face_list,light_list):
-#     for x,y in itertools.product(range(camera.resolution[0]),range(camera.resolition[1])):
-#         ren_ray
-
 class Scene(object):
     def __init__(self):
         self.face_list = []
@@ -38,5 +34,8 @@ class Scene(object):
         for camera in self.camera_list:
             ren_camera(camera,self.face_list,self.light_list)
 
+    def write_scene(self):
+        for camera in self.camera_list:
+            camera.write_image()
         
 
