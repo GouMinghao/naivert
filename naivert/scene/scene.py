@@ -62,12 +62,12 @@ class Scene(object):
         '''
         self.camera_list.append(camera)
 
-    def render_scene(self):
+    def render_scene(self,num_proc = 1):
         '''
         render all the camera images under the scene.
         '''
         for camera in self.camera_list:
-            ren_camera(camera,self.face_list,self.light_list)
+            ren_camera(camera,self.face_list,self.light_list,num_proc = num_proc)
 
     def write_scene(self):
         '''

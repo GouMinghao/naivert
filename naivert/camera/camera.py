@@ -4,6 +4,7 @@ import cv2
 import itertools
 import copy
 import math
+from multiprocessing import Pool
 
 from ..geometry.inter_halfline_face_list import inter_halfline_face_list
 from ..geometry.get_refraction_halfline import get_refraction_halfline
@@ -93,7 +94,19 @@ class Camera(object):
         """
         self.image = self.image / (np.max(self.image))
 
-def ren_camera(camera,face_list,light_list):
+def ren_camera_wrapper(it):
+    (x,y,camera,face_list,light_list) = it
+    print('rendering pixel x={}, y={}'.format(x,y))
+    primary_halfline = camera.primary_halfline(x,y)
+    ray_list = []
+    trace_ray(primary_halfline,[],ray_list,face_list,light_list,depth = get_rt_max_depth(),current_face = None,n = 1)
+    return cal_ray(ray_list)
+
+def get_iter(camera,face_list,light_list):
+    for x,y in itertools.product(range(camera.resolution[1]),range(camera.resolution[0])):
+        yield (x,y,camera,face_list,light_list)
+
+def ren_camera(camera,face_list,light_list,num_proc = 1):
     """
     **Input:**
     
@@ -103,14 +116,24 @@ def ren_camera(camera,face_list,light_list):
 
     - light_list: a list of Light of the scene
     """
-    for x,y in itertools.product(range(camera.resolution[1]),range(camera.resolution[0])):
-        print('rendering pixel x={}, y={}'.format(x,y))
-        primary_halfline = camera.primary_halfline(x,y)
-        ray_list = []
-        trace_ray(primary_halfline,[],ray_list,face_list,light_list,depth = get_rt_max_depth(),current_face = None,n = 1)
-        # for ray in ray_list:
-        #     print(ray)
-        camera.image[x][y] = cal_ray(ray_list)
+    if num_proc == 1:
+        for x,y in itertools.product(range(camera.resolution[1]),range(camera.resolution[0])):
+            print('rendering pixel x={}, y={}'.format(x,y))
+            primary_halfline = camera.primary_halfline(x,y)
+            ray_list = []
+            trace_ray(primary_halfline,[],ray_list,face_list,light_list,depth = get_rt_max_depth(),current_face = None,n = 1)
+            # for ray in ray_list:
+            #     print(ray)
+            camera.image[x][y] = cal_ray(ray_list)
+    else:
+        p = Pool(processes=num_proc)
+        res = p.map(ren_camera_wrapper,get_iter(camera,face_list,light_list))
+        i=0
+        for x,y in itertools.product(range(camera.resolution[1]),range(camera.resolution[0])):
+            camera.image[x][y] = res[i]
+            i+=1
+        p.close()
+        p.join()
     camera.unify_intensity()
 
 
@@ -156,6 +179,10 @@ def trace_ray(halfline,trace_list,ray_list,face_list,light_list,depth,current_fa
             if isinstance(light,AmbientLight):
                 ray_list.append(copy.deepcopy(trace_list)+[d,face.material.ka,light])
             elif isinstance(light,PointLight):
+                light_i,light_d,light_f=inter_halfline_face_list(HalfLine(inter_point,light.pos),face_list,current_face=face) 
+                if not light_i == light.pos:
+                    continue
+                print('not continue')
                 L_vec = Vector(inter_point,light.pos).normalized()
                 N_vec = face.cpg.plane.n.normalized()
                 V_vec = halfline.vector.normalized()

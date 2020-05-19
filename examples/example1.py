@@ -1,7 +1,7 @@
 import naivert
 from Geometry3D import *
 main_scene = naivert.Scene()
-main_camera = naivert.Camera(Point(50,-50,50),Point(50,0.01,50),Vector(0,0,25),Vector(25,0,0),'main_camera.png',resolution=(20,10))
+main_camera = naivert.Camera(Point(50,-50,50),Point(50,0.01,50),Vector(0,0,25),Vector(25,0,0),'main_camera.png',resolution=(640,480))
 point_light = naivert.PointLight(Point(50,100,100),naivert.WHITE)
 ambient_light = naivert.AmbientLight(naivert.BLUE)
 main_scene.add_camera(main_camera)
@@ -16,6 +16,6 @@ main_scene.add_cph(Cylinder(Point(30,70,0),10,30*z_unit_vector()),material=naive
 # for face in main_scene.face_list:
 #     r.add((face.cpg,'r',1))
 # r.show()
-main_scene.render_scene()
+main_scene.render_scene(40)
 main_scene.write_scene()
 print(main_scene)
