@@ -36,7 +36,7 @@ class Material(object):
         return cls(
             n = 1,
             f_reflect=np.array([0.3,0.3,0.3]),
-            f_refract=np.array([0.,0.,0.]),
+            f_refract=np.array([0.0,0.0,0.0]),
             ks = np.array([0.65,0.65,0.65]),
             kd = np.array([0.1,0.1,0.1]),
             ka = np.array([0,0,0]),
@@ -48,7 +48,7 @@ class Material(object):
         return cls(
             n = 1,
             f_reflect=np.array([0.6,0.2,0.2]),
-            f_refract=np.array([0.,0.,0.]),
+            f_refract=np.array([0.0,0.0,0.0]),
             ks = np.array([0.6,0.2,0.2]),
             kd = np.array([0.15,0.05,0.05]),
             ka = np.array([0.1,0.1,0.1]),
@@ -60,7 +60,7 @@ class Material(object):
         return cls(
             n = 1,
             f_reflect=np.array([0.2,0.6,0.2]),
-            f_refract=np.array([0.,0.,0.]),
+            f_refract=np.array([0.0,0.0,0.0]),
             ks = np.array([0.2,0.6,0.2]),
             kd = np.array([0.05,0.15,0.05]),
             ka = np.array([0.1,0.1,0.1]),
@@ -72,7 +72,7 @@ class Material(object):
         return cls(
             n = 1,
             f_reflect=np.array([0.2,0.2,0.6]),
-            f_refract=np.array([0.,0.,0.]),
+            f_refract=np.array([0.0,0.0,0.0]),
             ks = np.array([0.2,0.2,0.6]),
             kd = np.array([0.05,0.05,0.15]),
             ka = np.array([0.1,0.1,0.1]),
@@ -84,7 +84,7 @@ class Material(object):
         return cls(
             n = 1,
             f_reflect=np.array([0.7,0.7,0.7]),
-            f_refract=np.array([0.,0.,0.]),
+            f_refract=np.array([0.0,0.0,0.0]),
             ks = np.array([0.95,0.95,0.95]),
             kd = np.array([0.02,0.02,0.02]),
             ka = np.array([0,0,0]),

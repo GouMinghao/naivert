@@ -1,7 +1,7 @@
 import math
 from Geometry3D import Point, intersection, distance
 
-def inter_halfline_face_list(hl,face_list):
+def inter_halfline_face_list(hl,face_list,current_face):
     """
     **Input:**
     
@@ -23,6 +23,9 @@ def inter_halfline_face_list(hl,face_list):
     least_distance = math.inf
     inter_face = None
     for face in face_list:
+        if current_face is not None:
+            if face.cpg == current_face.cpg:
+                continue
         inter_pt = intersection(hl,face.cpg)
         if inter_pt is not None:
             if isinstance(inter_pt,Point):

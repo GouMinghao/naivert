@@ -35,7 +35,7 @@ class Camera(object):
         self.y_vec = y_vec
         self.resolution = resolution
         self.z_vec = Vector(focus_point,main_point)
-        self.image = np.zeros((resolution[0],resolution[1],3),dtype=np.float32)
+        self.image = np.zeros((resolution[1],resolution[0],3),dtype=np.float32)
         self.image_path = image_path
         if not orthogonal(self.x_vec,self.y_vec):
             raise ValueError('x_vec and y_vec are not orthogonal')
@@ -60,12 +60,12 @@ class Camera(object):
 
         - The figure is given in the root folder/camera.png
         """
-        width = self.resolution[0]
-        height = self.resolution[1]
-        x_step_vec = self.y_vec * (1/width) # be careful here, don't confuse the x and y
-        y_step_vec = self.x_vec * (1/height) # be careful here, don't confuse the x and y
+        width = self.resolution[1]
+        height = self.resolution[0]
+        x_step_vec = -self.x_vec * (1/width) # be careful here, don't confuse the x and y
+        y_step_vec = self.y_vec * (1/height) # be careful here, don't confuse the x and y
         p = copy.deepcopy(self.main_point).move(x_step_vec * (-width / 2 + x + 0.5)).move(y_step_vec * (-height / 2 + y + 0.5))
-        return HalfLine(self.focus_point,p)
+        return HalfLine(p,Vector(self.focus_point,p))
 
     def set_image_path(self,image_path):
         """
@@ -83,7 +83,7 @@ class Camera(object):
         import cv2
         if self.image_path is None:
             raise ValueError('Image path not set for this camera')
-        cv2.imwrite(self.image_path,self.image)
+        cv2.imwrite(self.image_path,(self.image * 255.0).astype(np.uint8))
 
     def unify_intensity(self):
         """
@@ -91,7 +91,7 @@ class Camera(object):
         
         - Unify the intensity of the image to [0,1]
         """
-        self.image = self.image / (max(self.image))
+        self.image = self.image / (np.max(self.image))
 
 def ren_camera(camera,face_list,light_list):
     """
@@ -103,16 +103,18 @@ def ren_camera(camera,face_list,light_list):
 
     - light_list: a list of Light of the scene
     """
-    for x,y in itertools.product(range(camera.resolution[0]),range(camera.resolution[1])):
+    for x,y in itertools.product(range(camera.resolution[1]),range(camera.resolution[0])):
+        print('rendering pixel x={}, y={}'.format(x,y))
         primary_halfline = camera.primary_halfline(x,y)
-        print(primary_halfline)
         ray_list = []
-        trace_ray(primary_halfline,[],ray_list,face_list,light_list,depth = get_rt_max_depth(),n = 1)
+        trace_ray(primary_halfline,[],ray_list,face_list,light_list,depth = get_rt_max_depth(),current_face = None,n = 1)
+        # for ray in ray_list:
+        #     print(ray)
         camera.image[x][y] = cal_ray(ray_list)
     camera.unify_intensity()
 
 
-def trace_ray(halfline,trace_list,ray_list,face_list,light_list,depth,n=1):
+def trace_ray(halfline,trace_list,ray_list,face_list,light_list,depth,current_face,n=1):
     """
     **Input:**
     
@@ -128,23 +130,27 @@ def trace_ray(halfline,trace_list,ray_list,face_list,light_list,depth,n=1):
 
     - n: a float of the refraction rate of the input material
     """
+    
     if depth == 0:
         return
-    inter_point,d,face = inter_halfline_face_list(halfline,face_list)
+    inter_point,d,face = inter_halfline_face_list(halfline,face_list,current_face=current_face) 
     if inter_point is None:
         return
+    # print('call trace_ray with trace_list={},d={},point={},cpg={}\n'.format(trace_list,d,inter_point,face.cpg))
     if n > 1: # when the ray come out of a transparent 
         refraction_halfline = get_refraction_halfline(halfline,n,1,face.cpg)
+        if refraction_halfline is not None:
         # only refraction ray
-        trace_ray(refraction_halfline,copy.deepcopy(trace_list).append(d).append(NO_LOSS),ray_list,face_list,light_list,depth = depth-1,n = 1)
+            trace_ray(refraction_halfline,copy.deepcopy(trace_list)+[d,NO_LOSS],ray_list,face_list,light_list,depth = depth-1,current_face = face,n = 1)
     else: # n == 1
         # refraction ray
-        if (face.material.f_refract == np.zeros(3)).all(): # there should be refraction of the material
+        if not (face.material.f_refract == np.zeros(3)).all(): # there should be refraction of the material
             refraction_halfline = get_refraction_halfline(halfline,1,face.material.n,face.cpg)
-            trace_ray(refraction_halfline,copy.deepcopy(trace_list).append(d).append(face.material.f_refract),ray_list,face_list,light_list,depth = depth - 1,n = face.material.n)
+            if refraction_halfline is not None:
+                trace_ray(refraction_halfline,copy.deepcopy(trace_list)+[d,face.material.f_refract],ray_list,face_list,light_list,depth = depth - 1,current_face = face,n = face.material.n)
         # reflection ray
         reflection_halfline = get_reflection_halfline(halfline,face.cpg)
-        trace_ray(reflection_halfline,copy.deepcopy(trace_list).append(d).append(face.material.f_reflect),ray_list,face_list,light_list,depth = depth - 1,n = face.material.n)
+        trace_ray(reflection_halfline,copy.deepcopy(trace_list)+[d,face.material.f_reflect],ray_list,face_list,light_list,depth = depth - 1,current_face = face,n = face.material.n)
         # light
         for light in light_list:
             if isinstance(light,AmbientLight):
@@ -160,7 +166,7 @@ def trace_ray(halfline,trace_list,ray_list,face_list,light_list,depth,n=1):
                     i_s[i] = face.material.ks[i] * math.pow(R_vec * V_vec,face.material.alpha)
                 i_d = face.material.kd * (L_vec * N_vec)
                 d_light = distance(inter_point,light.pos)
-                ray_list.append(copy.deepcopy(trace_list)+[d,i_s+ i_d+d_light+light])
+                ray_list.append(copy.deepcopy(trace_list)+[d,i_s+ i_d,d_light,light])
                 # ray_list type 1: [... k, distance, i_s + i_d, distance, point light]
                 # ray_list type 2: [... k, distance, ks, ambient light]
             else:

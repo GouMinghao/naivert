@@ -29,6 +29,9 @@ def get_refraction_halfline(in_hl,in_n,out_n,cpg):
     tan_vec = get_tangential_vector(in_vec,normal)
     sin_theta_input = math.sin(angle(normal,in_vec))
     sin_theta_output = sin_theta_input * in_n / out_n
+    # print(sin_theta_output)
+    if sin_theta_output > 1:
+        return None
     theta_out = math.asin(sin_theta_output)
     if tan_vec.length() < get_eps():
         out_vec = normal.normalized() * math.cos(theta_out)
