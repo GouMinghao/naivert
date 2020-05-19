@@ -1,3 +1,3 @@
-from .camera import Camera
+from .camera import Camera, ren_camera
 
-__all__ = ('Camera',)
+__all__ = ('Camera','ren_camera')

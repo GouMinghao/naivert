@@ -8,10 +8,11 @@ __all__ = (
     'get_tangential_vector',
     'get_reflection_halfline',
     'get_refraction_halfline',
-    'inter_halfline_cpgs',
+    'inter_halfline_face_lists',
     'Face',
     'Material',
     'Camera',
+    'Light',
     'PointLight',
     'Scene',
 )

@@ -1,7 +1,13 @@
-from ..camera.camera import Camera
+from ..camera.camera import Camera,ren_camera
 from ..material.material import Material
 from ..light.light import PointLight
 from ..geometry.face import Face
+
+import itertools
+
+# def ren_camera(camera,face_list,light_list):
+#     for x,y in itertools.product(range(camera.resolution[0]),range(camera.resolition[1])):
+#         ren_ray
 
 class Scene(object):
     def __init__(self):
@@ -9,6 +15,10 @@ class Scene(object):
         self.light_list = []
         self.camera_list = []
         
+    def cpgs(self):
+        for face in self.face_list:
+            yield face.cpg
+    
     def add_cph(self,cph,material,reverse_normal = False):
         for cpg in cph.convex_polygens:
             if reverse_normal:
@@ -26,5 +36,7 @@ class Scene(object):
 
     def render_scene(self):
         for camera in self.camera_list:
-            ren_camera
+            ren_camera(camera,self.face_list,self.light_list)
+
         
+

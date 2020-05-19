@@ -1,3 +1,4 @@
+import numpy as np
 class Material(object):
     '''Class Maririal
 
@@ -13,7 +14,7 @@ class Material(object):
     
     - kd: list of three floats of the diffusion light coefficient
 
-    - ks: list of three float of the ambient light coefficient
+    - ka: list of three float of the ambient light coefficient
 
     - alpha: gloss constant
     '''
@@ -22,15 +23,25 @@ class Material(object):
     def Glass(cls):
         return cls(
             n = 1.33,
-            f_reflect=[0.05,0.05,0.05],
-            f_refract=[0.95,0.95,0.95],
-            ks = [0.95,0.95,0.95],
-            kd = [0.02,0.02,0.02],
-            ka = [0,0,0],
-            alpha = [10,10,10]
+            f_reflect=np.array([0.05,0.05,0.05]),
+            f_refract=np.array([0.95,0.95,0.95]),
+            ks = np.array([0.95,0.95,0.95]),
+            kd = np.array([0.02,0.02,0.02]),
+            ka = np.array([0,0,0]),
+            alpha = np.array([10,10,10])
             )
 
-    
+    @classmethod
+    def DiffusionMaterial_1(cls):
+        return cls(
+            n = 1,
+            f_reflect=np.array([0.3,0.3,0.3]),
+            f_refract=np.array([0.,0.,0.]),
+            ks = np.array([0.65,0.65,0.65]),
+            kd = np.array([0.1,0.1,0.1]),
+            ka = np.array([0,0,0]),
+            alpha = np.array([4,4,4])
+            )
 
 
     def __init__(self,n,f_reflect,f_refract,ks,kd,ka,alpha):

@@ -1,5 +1,14 @@
 from Geometry3D import Vector,orthogonal
 import numpy as np
+import cv2
+import itertools
+import copy
+
+from ..geometry.inter_halfline_face_list import inter_halfline_face_list
+from ..geometry.get_refraction_halfline import get_refraction_halfline
+from ..geometry.get_reflection_halfline import get_reflection_halfline
+from ..utils.constant import get_rt_max_depth,NO_LOSS
+
 class Camera(object):
     '''
     Camera class.
@@ -24,7 +33,7 @@ class Camera(object):
         self.y_vec = y_vec
         self.resolution = resolution
         self.z_vec = Vector(focus_point,main_point)
-        self.image = np.zeros((3,resolution[0],resolution[1]))
+        self.image = np.zeros((resolution[0],resolution[1],3),dtype=np.float32)
         self.image_path = image_path
         if not orthogonal(self.x_vec,self.y_vec):
             raise ValueError('x_vec and y_vec are not orthogonal')
@@ -40,9 +49,7 @@ class Camera(object):
         - x: int of the index of the array.
 
         - y: int of the index of the array.
-
-        - x and y are the numpy array indexes.
-
+    'Material',
         **Output:**
 
         - Geometry3D.HalfLine of the primary ray of the (x,y) pixel.
@@ -51,7 +58,7 @@ class Camera(object):
 
         - The figure is given in the root folder/camera.png
         ''' 
-
+        # needs to be implemented.
 
     def set_image_path(self,image_path):
         self.image_path = image_path
@@ -62,4 +69,65 @@ class Camera(object):
             raise ValueError('Image path not set for this camera')
         cv2.imwrite(self.image_path,self.image)
 
-__all__=('Camera',)
+    def unify_intensity(self):
+        self.image = self.image / (max(self.image))
+
+def ren_camera(camera,face_list,light_list):
+    '''
+    ** Input: **
+    
+    - camera: Camera of the camera that want to render
+
+    - face_list: a list of Faces of a scene
+
+    - light_list: a list of Light of the scene
+    '''
+    for x,y in itertools.product(range(camera.resolution[0]),range(camera.resolition[1])):
+        primary_halfline = camera.primary_halfline(x,y)
+        ray_list = []
+        trace_ray(primary_halfline,[],ray_list,face_list,depth = get_rt_max_depth(),n = 1)
+        camera.image[x][y] = cal_ray(ray_list)
+    camera.unify_intensity()
+
+
+def trace_ray(halfline,trace_list,ray_list,face_list,depth,n=1):
+    '''
+    **Input:**
+    
+    - halfline: Geometry3D.HalfLine of the input HalfLine
+
+    - trace_list: a list of the current path of the ray now
+
+    - ray_list: a list of trace list which will be used to calculate the intersity of light
+
+    - face_list: a list of Faces of the scene
+
+    - depth: the transformation depth remained
+
+    - n: a float of the refraction rate of the input material
+    '''
+    if depth == 0:
+        return
+    inter_point,d,face = inter_halfline_face_list(halfline,face_list)
+    if inter_point is None:
+        return
+    if n > 1: # when the ray come out of a transparent 
+        refraction_halfline = get_refraction_halfline(halfline,n,1,face.cpg)
+        # only refraction ray
+        trace_ray(refraction_halfline,copy.deepcopy(trace_list).append(d).append(NO_LOSS),ray_list,face_list,depth = depth-1,n = 1)
+    else: # n == 1
+        # refraction ray
+        if (face.material.f_refract == np.zeros(3)).all(): # there should be refraction of the material
+            refraction_halfline = get_refraction_halfline(halfline,1,face.material.n,face.cpg)
+            trace_ray(refraction_halfline,copy.deepcopy(trace_list).append(d).append(face.material.f_refract),ray_list,face_list,depth = depth - 1,n = face.material.n)
+        # reflection ray
+        reflection_halfline = get_reflection_halfline(halfline,face.cpg)
+        trace_ray(reflection_halfline,copy.deepcopy(trace_list).append(d).append(face.material.f_reflect),ray_list,face_list,depth = depth - 1,n = face.material.n)
+        # light
+            
+
+def cal_ray(ray_list):
+    return np.array([0,0,0],dtype=np.uint8)
+    # needs to be implemented.
+
+__all__=('Camera','ren_camera')

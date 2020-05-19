@@ -1,7 +1,12 @@
 from Geometry3D import *
 import copy
+class Light(object):
+    '''
+    A base light class
+    '''
+    pass
 
-class PointLight(object):
+class PointLight(Light):
     '''
     Point light source class
 
@@ -15,4 +20,4 @@ class PointLight(object):
         self.pos = pos
         self.rgb = copy.deepcopy(rgb)
 
-__all__ = ('PointLight',)
+__all__ = ('Light','PointLight',)
