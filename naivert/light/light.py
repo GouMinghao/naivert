@@ -10,7 +10,7 @@ class PointLight(Light):
     '''
     Point light source class
 
-    ** Input: **
+    **Input:**
 
     - pos: Geometry3D.Point
 
@@ -24,7 +24,7 @@ class AmbientLight(Light):
     '''
     Ambient light source class
 
-    ** Input: **
+    **Input:**
 
     - rgb: list of rgb light strength
     '''

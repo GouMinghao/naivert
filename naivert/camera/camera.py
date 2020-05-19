@@ -1,4 +1,4 @@
-from Geometry3D import Vector,orthogonal,distance
+from Geometry3D import Vector, orthogonal, distance, HalfLine
 import numpy as np
 import cv2
 import itertools
@@ -59,8 +59,13 @@ class Camera(object):
         **Illustration:**
 
         - The figure is given in the root folder/camera.png
-        """ 
-        
+        """
+        width = self.resolution[0]
+        height = self.resolution[1]
+        x_step_vec = self.y_vec / width # be careful here, don't confuse the x and y
+        y_step_vec = self.x_vec / height # be careful here, don't confuse the x and y
+        p = copy.deepcopy(self.main_point).move(x_step_vec * (-width / 2 + x + 0.5)).move(y_step_vec * (-height / 2 + y + 0.5))
+        return HalfLine(self.focus_point,p)
 
     def set_image_path(self,image_path):
         """

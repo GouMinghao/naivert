@@ -9,7 +9,7 @@ def inter_halfline_face_list(hl,face_list):
 
     - faces: list of Faces
 
-    ** Output: **
+    **Output:**
     
     - (point,distance)
 
