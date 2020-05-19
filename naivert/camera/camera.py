@@ -182,7 +182,6 @@ def trace_ray(halfline,trace_list,ray_list,face_list,light_list,depth,current_fa
                 light_i,light_d,light_f=inter_halfline_face_list(HalfLine(inter_point,light.pos),face_list,current_face=face) 
                 if not light_i == light.pos:
                     continue
-                print('not continue')
                 L_vec = Vector(inter_point,light.pos).normalized()
                 N_vec = face.cpg.plane.n.normalized()
                 V_vec = halfline.vector.normalized()
@@ -218,6 +217,8 @@ def cal_ray(ray_list):
                 ray_intensity *= k
             else: #distance
                 if total_d == 0:
+                    if k < 1e-5:
+                        k == 0.01
                     ray_intensity *= 1 / math.pow(k,2)
                     total_d = k 
                 else:
