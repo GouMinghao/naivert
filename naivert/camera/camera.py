@@ -226,6 +226,8 @@ def trace_ray(halfline,trace_list,ray_list,face_list,point_list,light_list,depth
                 
                 light_i,light_d,light_f=inter_halfline_face_list(HalfLine(inter_point,light.pos),face_list,current_face=face) 
                 if light_i is not None:
+                    if light_i == inter_point:
+                        continue # deal with some cases
                     if not light.pos in Segment(light_i,inter_point):
                         print('intersection point:{},light point:{}'.format(light_i,light.pos))
                         continue
