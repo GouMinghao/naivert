@@ -2,6 +2,7 @@ __pycache__/
 /.vscode/
 *.pyc
 *.swp
+main_camera.png
 build/
 doc/build/
 /*.egg-info/
