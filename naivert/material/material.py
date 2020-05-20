@@ -51,7 +51,7 @@ class Material(object):
             f_refract=np.array([0.0,0.0,0.0]),
             ks = np.array([0.6,0.2,0.2]),
             kd = np.array([0.15,0.05,0.05]),
-            ka = np.array([0.1,0.1,0.1]),
+            ka = np.array([0.1,0.0,0.0]),
             alpha = 2
             )
 
@@ -63,7 +63,7 @@ class Material(object):
             f_refract=np.array([0.0,0.0,0.0]),
             ks = np.array([0.2,0.6,0.2]),
             kd = np.array([0.05,0.15,0.05]),
-            ka = np.array([0.1,0.1,0.1]),
+            ka = np.array([0.0,0.1,0.0]),
             alpha = 2
             )
 
@@ -75,7 +75,7 @@ class Material(object):
             f_refract=np.array([0.0,0.0,0.0]),
             ks = np.array([0.2,0.2,0.6]),
             kd = np.array([0.05,0.05,0.15]),
-            ka = np.array([0.1,0.1,0.1]),
+            ka = np.array([0.0,0.0,0.1]),
             alpha = 2
             )
 

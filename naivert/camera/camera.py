@@ -92,7 +92,8 @@ class Camera(object):
         
         - Unify the intensity of the image to [0,1]
         """
-        self.image = cv2.medianBlur(self.image / (np.max(self.image)),3)
+        self.image = cv2.medianBlur(self.image,3)
+        self.image = self.image / np.max(self.image)
 
 def ren_camera_wrapper(it):
     (x,y,camera,face_list,light_list) = it
