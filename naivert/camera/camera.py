@@ -1,4 +1,4 @@
-from Geometry3D import Vector, orthogonal, distance, HalfLine
+from Geometry3D import Vector, orthogonal, distance, HalfLine, Renderer, Segment
 import numpy as np
 import cv2
 import itertools
@@ -92,14 +92,16 @@ class Camera(object):
         
         - Unify the intensity of the image to [0,1]
         """
-        self.image = cv2.medianBlur(self.image / (np.max(self.image)),3)
+        # self.image = cv2.medianBlur(self.image,3)
+        print(self.image.max())
+        self.image = self.image / np.max(self.image)
 
 def ren_camera_wrapper(it):
     (x,y,camera,face_list,light_list) = it
     print('rendering pixel x={}, y={}'.format(x,y))
     primary_halfline = camera.primary_halfline(x,y)
     ray_list = []
-    trace_ray(primary_halfline,[],ray_list,face_list,light_list,depth = get_rt_max_depth(),current_face = None,n = 1)
+    trace_ray(primary_halfline,[],ray_list,face_list,[],light_list,depth = get_rt_max_depth(),current_face = None,n = 1)
     return cal_ray(ray_list)
 
 def get_iter(camera,face_list,light_list):
@@ -121,7 +123,7 @@ def ren_camera(camera,face_list,light_list,num_proc = 1):
             print('rendering pixel x={}, y={}'.format(x,y))
             primary_halfline = camera.primary_halfline(x,y)
             ray_list = []
-            trace_ray(primary_halfline,[],ray_list,face_list,light_list,depth = get_rt_max_depth(),current_face = None,n = 1)
+            trace_ray(primary_halfline,[],ray_list,face_list,[],light_list,depth = get_rt_max_depth(),current_face = None,n = 1)
             # for ray in ray_list:
             #     print(ray)
             camera.image[x][y] = cal_ray(ray_list)
@@ -132,12 +134,13 @@ def ren_camera(camera,face_list,light_list,num_proc = 1):
         for x,y in itertools.product(range(camera.resolution[1]),range(camera.resolution[0])):
             camera.image[x][y] = res[i]
             i+=1
+        print(camera.image.max())
         p.close()
         p.join()
     camera.unify_intensity()
 
 
-def trace_ray(halfline,trace_list,ray_list,face_list,light_list,depth,current_face,n=1):
+def trace_ray(halfline,trace_list,ray_list,face_list,point_list,light_list,depth,current_face,n=1):
     """
     **Input:**
     
@@ -164,24 +167,68 @@ def trace_ray(halfline,trace_list,ray_list,face_list,light_list,depth,current_fa
         refraction_halfline = get_refraction_halfline(halfline,n,1,face.cpg)
         if refraction_halfline is not None:
         # only refraction ray
-            trace_ray(refraction_halfline,copy.deepcopy(trace_list)+[d,NO_LOSS],ray_list,face_list,light_list,depth = depth-1,current_face = face,n = 1)
+            trace_ray(
+                halfline = refraction_halfline,
+                trace_list = copy.deepcopy(trace_list)+[d,NO_LOSS],
+                ray_list = ray_list,
+                face_list = face_list,
+                point_list = copy.deepcopy(point_list)+[inter_point],
+                light_list = light_list,
+                depth = depth-1,
+                current_face = face,
+                n = 1
+            )
     else: # n == 1
         # refraction ray
         if not (face.material.f_refract == np.zeros(3)).all(): # there should be refraction of the material
             refraction_halfline = get_refraction_halfline(halfline,1,face.material.n,face.cpg)
             if refraction_halfline is not None:
-                trace_ray(refraction_halfline,copy.deepcopy(trace_list)+[d,face.material.f_refract],ray_list,face_list,light_list,depth = depth - 1,current_face = face,n = face.material.n)
+                trace_ray(
+                    halfline = refraction_halfline,
+                    trace_list = copy.deepcopy(trace_list)+[d,face.material.f_refract],
+                    ray_list = ray_list,
+                    face_list = face_list,
+                    point_list = copy.deepcopy(point_list)+[inter_point],
+                    light_list = light_list,
+                    depth = depth - 1,
+                    current_face = face,
+                    n = face.material.n
+                )      
         # reflection ray
         reflection_halfline = get_reflection_halfline(halfline,face.cpg)
-        trace_ray(reflection_halfline,copy.deepcopy(trace_list)+[d,face.material.f_reflect],ray_list,face_list,light_list,depth = depth - 1,current_face = face,n = face.material.n)
+        trace_ray(
+            halfline = reflection_halfline,
+            trace_list = copy.deepcopy(trace_list)+[d,face.material.f_reflect],
+            ray_list = ray_list,
+            face_list = face_list,
+            point_list = copy.deepcopy(point_list)+[inter_point],
+            light_list = light_list,
+            depth = depth - 1,
+            current_face = face,
+            n = face.material.n
+        )
         # light
         for light in light_list:
             if isinstance(light,AmbientLight):
+                # print('\033[0;32mpts list:\033[0m{}'.format(point_list))
                 ray_list.append(copy.deepcopy(trace_list)+[d,face.material.ka,light])
             elif isinstance(light,PointLight):
+                # print('\033[0;32mpts list:\033[0m{}'.format(point_list))
+
+
+                # r = Renderer()
+                # for face in face_list:
+                #     r.add((face.cpg,'r',1))
+                # for i in range(len(point_list) - 1):
+                #     r.add((Segment(point_list[i],point_list[i+1]),'b',2))
+                # r.show()
+
+                
                 light_i,light_d,light_f=inter_halfline_face_list(HalfLine(inter_point,light.pos),face_list,current_face=face) 
-                if not light_i == light.pos:
-                    continue
+                if light_i is not None:
+                    if not light.pos in Segment(light_i,inter_point):
+                        print('intersection point:{},light point:{}'.format(light_i,light.pos))
+                        continue
                 L_vec = Vector(inter_point,light.pos).normalized()
                 N_vec = face.cpg.plane.n.normalized()
                 V_vec = halfline.vector.normalized()
@@ -193,8 +240,6 @@ def trace_ray(halfline,trace_list,ray_list,face_list,light_list,depth,current_fa
                 i_d = face.material.kd * (L_vec * N_vec)
                 d_light = distance(inter_point,light.pos)
                 ray_list.append(copy.deepcopy(trace_list)+[d,i_s+ i_d,d_light,light])
-                # ray_list type 1: [... k, distance, i_s + i_d, distance, point light]
-                # ray_list type 2: [... k, distance, ks, ambient light]
             else:
                 raise TypeError('Unknown Light Type:{}'.format(type(light)))
 
@@ -209,7 +254,9 @@ def cal_ray(ray_list):
     -  the sum intensity of all the rays
     """
     intensity = np.zeros(3,dtype = np.float32)
+    
     for ray in ray_list:
+        
         total_d = 0
         ray_intensity = np.array(ray[-1].rgb)
         for k in reversed(ray[:-1]):
@@ -222,9 +269,10 @@ def cal_ray(ray_list):
                     ray_intensity *= 1 / math.pow(k,2)
                     total_d = k 
                 else:
-                    ray_intensity += math.pow(total_d,2) / math.pow(total_d + k,2)
+                    ray_intensity *= math.pow(total_d,2) / math.pow(total_d + k,2)
                     total_d += k
         intensity += ray_intensity
+        print('\033[0;34mRAY:\033[0m{},result=:{}'.format(ray,ray_intensity))
     return intensity
     
 
