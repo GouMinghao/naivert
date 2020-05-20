@@ -92,8 +92,8 @@ class Camera(object):
         
         - Unify the intensity of the image to [0,1]
         """
-        self.image = cv2.medianBlur(self.image,3)
-        print(self.image)
+        # self.image = cv2.medianBlur(self.image,3)
+        print(self.image.max())
         self.image = self.image / np.max(self.image)
 
 def ren_camera_wrapper(it):
@@ -130,11 +130,11 @@ def ren_camera(camera,face_list,light_list,num_proc = 1):
     else:
         p = Pool(processes=num_proc)
         res = p.map(ren_camera_wrapper,get_iter(camera,face_list,light_list))
-        print(res)
         i=0
         for x,y in itertools.product(range(camera.resolution[1]),range(camera.resolution[0])):
             camera.image[x][y] = res[i]
             i+=1
+        print(camera.image.max())
         p.close()
         p.join()
     camera.unify_intensity()
@@ -225,8 +225,10 @@ def trace_ray(halfline,trace_list,ray_list,face_list,point_list,light_list,depth
 
                 
                 light_i,light_d,light_f=inter_halfline_face_list(HalfLine(inter_point,light.pos),face_list,current_face=face) 
-                if not light_i == light.pos:
-                    continue
+                if light_i is not None:
+                    if not light.pos in Segment(light_i,inter_point):
+                        print('intersection point:{},light point:{}'.format(light_i,light.pos))
+                        continue
                 L_vec = Vector(inter_point,light.pos).normalized()
                 N_vec = face.cpg.plane.n.normalized()
                 V_vec = halfline.vector.normalized()

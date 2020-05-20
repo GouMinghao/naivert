@@ -47,7 +47,7 @@ class Material(object):
     def DiffusionMaterial_Blue_1(cls):
         return cls(
             n = 1,
-            f_reflect=np.array([0.6,0.0,0.0]),
+            f_reflect=np.array([0.6,0.05,0.05]),
             f_refract=np.array([0.0,0.0,0.0]),
             ks = np.array([0.6,0.0,0.0]),
             kd = np.array([0.15,0.01,0.01]),
@@ -59,7 +59,7 @@ class Material(object):
     def DiffusionMaterial_Green_1(cls):
         return cls(
             n = 1,
-            f_reflect=np.array([0.0,0.6,0.0]),
+            f_reflect=np.array([0.05,0.6,0.05]),
             f_refract=np.array([0.0,0.0,0.0]),
             ks = np.array([0.0,0.6,0.0]),
             kd = np.array([0.01,0.15,0.01]),
@@ -71,7 +71,7 @@ class Material(object):
     def DiffusionMaterial_Red_1(cls):
         return cls(
             n = 1,
-            f_reflect=np.array([0.0,0.0,0.6]),
+            f_reflect=np.array([0.05,0.05,0.6]),
             f_refract=np.array([0.0,0.0,0.0]),
             ks = np.array([0.0,0.0,0.6]),
             kd = np.array([0.01,0.01,0.15]),
@@ -86,7 +86,7 @@ class Material(object):
             f_reflect=np.array([0.7,0.7,0.7]),
             f_refract=np.array([0.0,0.0,0.0]),
             ks = np.array([0.95,0.95,0.95]),
-            kd = np.array([0.02,0.02,0.02]),
+            kd = np.array([0.1,0.1,0.1]),
             ka = np.array([0,0,0]),
             alpha = 10
             )
