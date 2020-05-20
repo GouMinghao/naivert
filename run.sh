@@ -1,2 +1,2 @@
 pip install .
-python examples/example1.py
+python examples/example2.py

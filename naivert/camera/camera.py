@@ -215,7 +215,7 @@ def trace_ray(halfline,trace_list,ray_list,face_list,point_list,light_list,depth
                 r = Renderer()
                 for face in face_list:
                     r.add((face.cpg,'r',1))
-                for i in range(len(point_list) - 2):
+                for i in range(len(point_list) - 1):
                     r.add((Segment(point_list[i],point_list[i+1]),'b',2))
                 r.show()
                 light_i,light_d,light_f=inter_halfline_face_list(HalfLine(inter_point,light.pos),face_list,current_face=face) 
