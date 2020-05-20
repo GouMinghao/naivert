@@ -130,6 +130,7 @@ def ren_camera(camera,face_list,light_list,num_proc = 1):
     else:
         p = Pool(processes=num_proc)
         res = p.map(ren_camera_wrapper,get_iter(camera,face_list,light_list))
+        print(res)
         i=0
         for x,y in itertools.product(range(camera.resolution[1]),range(camera.resolution[0])):
             camera.image[x][y] = res[i]
