@@ -92,7 +92,7 @@ class Camera(object):
         
         - Unify the intensity of the image to [0,1]
         """
-        self.image = self.image / (np.max(self.image))
+        self.image = cv2.medianBlur(self.image / (np.max(self.image)),3)
 
 def ren_camera_wrapper(it):
     (x,y,camera,face_list,light_list) = it
@@ -218,7 +218,7 @@ def cal_ray(ray_list):
             else: #distance
                 if total_d == 0:
                     if k < 1e-5:
-                        k == 0.01
+                        k = 0.01
                     ray_intensity *= 1 / math.pow(k,2)
                     total_d = k 
                 else:
