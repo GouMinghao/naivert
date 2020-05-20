@@ -1,7 +1,7 @@
 import naivert
 from Geometry3D import *
 main_scene = naivert.Scene()
-main_camera = naivert.Camera(Point(50,-50,50),Point(50,0.01,50),Vector(0,0,25),Vector(25,0,0),'main_camera.png',resolution=(640,480))
+main_camera = naivert.Camera(Point(50,-50,50),Point(50,0.01,50),Vector(0,0,25),Vector(25,0,0),'main_camera.png',resolution=(200,200))
 point_light = naivert.PointLight(Point(50,100,100),naivert.WHITE)
 ambient_light = naivert.AmbientLight(naivert.BLUE)
 main_scene.add_camera(main_camera)
