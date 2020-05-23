@@ -35,5 +35,5 @@ setup(
 
         keywords="ray tracing",
 
-        install_requires=['numpy', 'Geometry3D==0.2.0', 'opencv-python']
+        install_requires=['numpy', 'Geometry3D==0.2.1', 'opencv-python']
 )

@@ -93,7 +93,7 @@ class Camera(object):
         - Unify the intensity of the image to [0,1]
         """
         # self.image = cv2.medianBlur(self.image,3)
-        print(self.image.max())
+        # print(self.image.max())
         self.image = self.image / np.max(self.image)
 
 def ren_camera_wrapper(it):
@@ -101,8 +101,13 @@ def ren_camera_wrapper(it):
     print('rendering pixel x={}, y={}'.format(x,y))
     primary_halfline = camera.primary_halfline(x,y)
     ray_list = []
-    trace_ray(primary_halfline,[],ray_list,face_list,[],light_list,depth = get_rt_max_depth(),current_face = None,n = 1)
-    return cal_ray(ray_list)
+    point_all_list = []
+    trace_ray(primary_halfline,[],ray_list,face_list,[],point_all_list,light_list,depth = get_rt_max_depth(),current_face = None,n = 1)
+    res = cal_ray(ray_list)
+    # if (x == 49 or x == 48) and (y == 48 or y == 49):
+    #     # print('x={},y={},ray_list={},res = {}'.format(x,y,ray_list,res))
+    #     # print('res:{}'.format(res))
+    return res
 
 def get_iter(camera,face_list,light_list):
     for x,y in itertools.product(range(camera.resolution[1]),range(camera.resolution[0])):
@@ -123,7 +128,8 @@ def ren_camera(camera,face_list,light_list,num_proc = 1):
             print('rendering pixel x={}, y={}'.format(x,y))
             primary_halfline = camera.primary_halfline(x,y)
             ray_list = []
-            trace_ray(primary_halfline,[],ray_list,face_list,[],light_list,depth = get_rt_max_depth(),current_face = None,n = 1)
+            point_all_list = []
+            trace_ray(primary_halfline,[],ray_list,face_list,[],point_all_list,light_list,depth = get_rt_max_depth(),current_face = None,n = 1)
             # for ray in ray_list:
             #     print(ray)
             camera.image[x][y] = cal_ray(ray_list)
@@ -134,13 +140,13 @@ def ren_camera(camera,face_list,light_list,num_proc = 1):
         for x,y in itertools.product(range(camera.resolution[1]),range(camera.resolution[0])):
             camera.image[x][y] = res[i]
             i+=1
-        print(camera.image.max())
+        # print(camera.image.max())
         p.close()
         p.join()
     camera.unify_intensity()
 
 
-def trace_ray(halfline,trace_list,ray_list,face_list,point_list,light_list,depth,current_face,n=1):
+def trace_ray(halfline,trace_list,ray_list,face_list,point_list,point_all_list,light_list,depth,current_face,n=1):
     """
     **Input:**
     
@@ -173,6 +179,7 @@ def trace_ray(halfline,trace_list,ray_list,face_list,point_list,light_list,depth
                 ray_list = ray_list,
                 face_list = face_list,
                 point_list = copy.deepcopy(point_list)+[inter_point],
+                point_all_list = point_all_list,
                 light_list = light_list,
                 depth = depth-1,
                 current_face = face,
@@ -189,6 +196,7 @@ def trace_ray(halfline,trace_list,ray_list,face_list,point_list,light_list,depth
                     ray_list = ray_list,
                     face_list = face_list,
                     point_list = copy.deepcopy(point_list)+[inter_point],
+                    point_all_list = point_all_list,
                     light_list = light_list,
                     depth = depth - 1,
                     current_face = face,
@@ -202,6 +210,7 @@ def trace_ray(halfline,trace_list,ray_list,face_list,point_list,light_list,depth
             ray_list = ray_list,
             face_list = face_list,
             point_list = copy.deepcopy(point_list)+[inter_point],
+            point_all_list = point_all_list,
             light_list = light_list,
             depth = depth - 1,
             current_face = face,
@@ -212,16 +221,9 @@ def trace_ray(halfline,trace_list,ray_list,face_list,point_list,light_list,depth
             if isinstance(light,AmbientLight):
                 # print('\033[0;32mpts list:\033[0m{}'.format(point_list))
                 ray_list.append(copy.deepcopy(trace_list)+[d,face.material.ka,light])
+                point_all_list.append(point_list)
             elif isinstance(light,PointLight):
                 # print('\033[0;32mpts list:\033[0m{}'.format(point_list))
-
-
-                # r = Renderer()
-                # for face in face_list:
-                #     r.add((face.cpg,'r',1))
-                # for i in range(len(point_list) - 1):
-                #     r.add((Segment(point_list[i],point_list[i+1]),'b',2))
-                # r.show()
 
                 
                 light_i,light_d,light_f=inter_halfline_face_list(HalfLine(inter_point,light.pos),face_list,current_face=face) 
@@ -229,7 +231,7 @@ def trace_ray(halfline,trace_list,ray_list,face_list,point_list,light_list,depth
                     if light_i == inter_point:
                         continue # deal with some cases
                     if not light.pos in Segment(light_i,inter_point):
-                        print('intersection point:{},light point:{}'.format(light_i,light.pos))
+                        # print('intersection point:{},light point:{}'.format(light_i,light.pos))
                         continue
                 L_vec = Vector(inter_point,light.pos).normalized()
                 N_vec = face.cpg.plane.n.normalized()
@@ -238,10 +240,15 @@ def trace_ray(halfline,trace_list,ray_list,face_list,point_list,light_list,depth
                 H_vec = 0.5*(V_vec + L_vec).normalized()
                 i_s = np.zeros(3,dtype = np.float32)
                 for i in range(3):
-                    i_s[i] = face.material.ks[i] * math.pow(R_vec * V_vec,face.material.alpha)
+                    i_s[i] = face.material.ks[i] * math.pow(N_vec * H_vec / 2,face.material.alpha)
+                    if i_s[i] < 0:
+                        print('L_vec:{},N_vec:{},V_vec:{},R_vec:{},H_vec:{}'.format(L_vec,N_vec,V_vec,R_vec,H_vec))
                 i_d = face.material.kd * (L_vec * N_vec)
+                if i_d[0] <0:
+                    print('\033[0;32mL:{},N:{}\033[0m'.format(L_vec,N_vec))
                 d_light = distance(inter_point,light.pos)
                 ray_list.append(copy.deepcopy(trace_list)+[d,i_s+ i_d,d_light,light])
+                point_all_list.append(point_list)
             else:
                 raise TypeError('Unknown Light Type:{}'.format(type(light)))
 
@@ -264,6 +271,9 @@ def cal_ray(ray_list):
         for k in reversed(ray[:-1]):
             if isinstance(k,np.ndarray):
                 ray_intensity *= k
+                for i in range(3):
+                    if k[i] < 0:
+                        print('\033[0;33mWrong ray:\033[0m{}'.format(ray))
             else: #distance
                 if total_d == 0:
                     if k < 1e-5:
@@ -274,7 +284,7 @@ def cal_ray(ray_list):
                     ray_intensity *= math.pow(total_d,2) / math.pow(total_d + k,2)
                     total_d += k
         intensity += ray_intensity
-        print('\033[0;34mRAY:\033[0m{},result=:{}'.format(ray,ray_intensity))
+        # print('\033[0;34mRAY:\033[0m{},result=:{}'.format(ray,ray_intensity))
     return intensity
     
 
