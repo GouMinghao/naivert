@@ -80,7 +80,7 @@ class Scene(object):
         for i in range(n):
             for j in range(n):
                 cph = Parallelepiped(Point(x+i*ux,y+j*uy,z),x_unit_vector()*ux,y_unit_vector()*uy,z_unit_vector()*dz)
-                if i + j % 2 ==0:
+                if (i + j) % 2 ==0:
                     m = Material.SpecularMaterial_White_1()
                 else:
                     m = Material.DiffusionMaterial_White_1()
