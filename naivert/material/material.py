@@ -24,10 +24,10 @@ class Material(object):
         return cls(
             n = 1.33,
             f_reflect=np.array([0.05,0.05,0.05]),
-            f_refract=np.array([0.98,0.98,0.98]),
-            ks = np.array([0.1,0.1,0.1]),
-            kd = np.array([0.01,0.01,0.01]),
-            ka = np.array([0,0,0]),
+            f_refract=np.array([1.0,1.0,1.0]),
+            ks = np.array([0.01,0.01,0.01]),
+            kd = np.array([0.0,0.0,0.0]),
+            ka = np.array([0.0,0.0,0.0]),
             alpha = 10
             )
 
@@ -39,7 +39,7 @@ class Material(object):
             f_refract=np.array([0.0,0.0,0.0]),
             ks = np.array([0.65,0.65,0.65]),
             kd = np.array([0.1,0.1,0.1]),
-            ka = np.array([0,0,0]),
+            ka = np.array([0.0,0.0,0.0]),
             alpha = 2
             )
 
