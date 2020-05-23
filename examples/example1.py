@@ -17,6 +17,7 @@ main_scene.add_cph(Parallelepiped(Point(-50,-50,0),200*x_unit_vector(),200*y_uni
 main_scene.add_cph(Parallelepiped(Point(60,20,0),20*x_unit_vector(),20*y_unit_vector(), 60*z_unit_vector()),naivert.Material.Glass(),reverse_normal=False)
 main_scene.add_cph(Parallelepiped(Point(10,10,20),20*x_unit_vector(),20*y_unit_vector(), 50 *z_unit_vector()),naivert.Material.DiffusionMaterial_Red_1(),reverse_normal=False)
 main_scene.add_cph(Sphere(Point(70,70,40),20,20,10),naivert.Material.SpecularMaterial_White_1(),reverse_normal=False)
+main_scene.add_cph(Sphere(Point(100,50,0),20,20,10),naivert.Material.SpecularMaterial_White_1(),reverse_normal=False)
 main_scene.add_cph(Cone(Point(30,130,0),10,80*z_unit_vector(),n=20),material=naivert.Material.DiffusionMaterial_Green_1(),reverse_normal=False)
 main_scene.add_cph(Cylinder(Point(30,70,0),15,80*z_unit_vector(),n=20),material=naivert.Material.SpecularMaterial_White_1(),reverse_normal=False)
 r = Renderer()
