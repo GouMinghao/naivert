@@ -2,6 +2,7 @@ from ..camera.camera import Camera,ren_camera
 from ..material.material import Material
 from ..light.light import PointLight
 from ..geometry.face import Face
+from Geometry3D import *
 
 import itertools
 
@@ -68,6 +69,22 @@ class Scene(object):
         '''
         for camera in self.camera_list:
             ren_camera(camera,self.face_list,self.light_list,num_proc = num_proc)
+
+
+    def add_floor(self,x,dx,y,dy,z=-1,dz=1,n=10):
+        '''
+        render all the camera images under the scene.
+        '''
+        ux = dx / n
+        uy = dy / n
+        for i in range(n):
+            for j in range(n):
+                cph = Parallelepiped(Point(x+i*ux,y+j*uy,z),x_unit_vector()*ux,y_unit_vector()*uy,z_unit_vector()*dz)
+                if i + j % 2 ==0:
+                    m = Material.SpecularMaterial_White_1()
+                else:
+                    m = Material.DiffusionMaterial_White_1()
+                self.add_cph(cph,m)
 
     def write_scene(self):
         '''
