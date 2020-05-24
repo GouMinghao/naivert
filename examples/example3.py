@@ -15,9 +15,9 @@ main_scene.add_light(ambient_light)
 # main_scene.add_cph(Parallelepiped(origin(),100*x_unit_vector(),100*y_unit_vector(), 100 *z_unit_vector()),naivert.Material.DiffusionMaterial_White_1(),reverse_normal=True)
 # main_scene.add_cph(Parallelepiped(Point(-50,-50,0),200*x_unit_vector(),200*y_unit_vector(), -10*z_unit_vector()),naivert.Material.DiffusionMaterial_White_1(),reverse_normal=False)
 main_scene.add_floor(-50,200,-50,200)
-main_scene.add_cph(Parallelepiped(Point(-51,-50,0),1*x_unit_vector(),200*y_unit_vector(),200*z_unit_vector(),naivert.Material.SpecularMaterial_White_1(),reverse_normal=False))
+main_scene.add_cph(Parallelepiped(Point(-51,-50,0),1*x_unit_vector(),200*y_unit_vector(),200*z_unit_vector()),naivert.Material.SpecularMaterial_White_1(),reverse_normal=False)
 
-main_scene.add_cph(Parallelepiped(Point(-50,150,0),200*x_unit_vector(),1*y_unit_vector(),200*z_unit_vector(),naivert.Material.SpecularMaterial_White_1(),reverse_normal=False))
+main_scene.add_cph(Parallelepiped(Point(-50,150,0),200*x_unit_vector(),1*y_unit_vector(),200*z_unit_vector()),naivert.Material.SpecularMaterial_White_1(),reverse_normal=False)
 
 main_scene.add_cph(Parallelepiped(Point(50,0,0),30*x_unit_vector()+40*y_unit_vector(),-4*x_unit_vector()+3*y_unit_vector(), 80*z_unit_vector()),naivert.Material.Glass(),reverse_normal=False)
 
