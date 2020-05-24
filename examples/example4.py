@@ -21,5 +21,5 @@ main_scene.add_cph(Sphere(Point(0,50,15),15,30,15),naivert.Material.SpecularMate
 main_scene.add_cph(Sphere(Point(50,100,15),15,30,15),naivert.Material.SpecularMaterial_White_1(),reverse_normal=False)
 main_scene.add_cph(Sphere(Point(100,50,15),15,30,15),naivert.Material.SpecularMaterial_White_1(),reverse_normal=False)
 main_scene.add_cph(Sphere(Point(50,50,15),15,30,15),naivert.Material.Glass(),reverse_normal=False)
-main_scene.render_scene(56)
+main_scene.render_scene(72)
 main_scene.write_scene()
