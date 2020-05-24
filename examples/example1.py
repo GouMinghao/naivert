@@ -24,6 +24,6 @@ r = Renderer()
 for face in main_scene.face_list:
     r.add((face.cpg,'r',1))
 r.show()
-main_scene.render_scene(40)
+main_scene.render_scene(56)
 main_scene.write_scene()
 # print(main_scene)
