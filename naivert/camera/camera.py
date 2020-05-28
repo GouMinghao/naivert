@@ -4,7 +4,7 @@ import cv2
 import itertools
 import copy
 import math
-from multiprocessing import Pool
+from multiprocessing import Pool,Array
 
 from ..geometry.inter_halfline_face_list import inter_halfline_face_list
 from ..geometry.get_refraction_halfline import get_refraction_halfline
@@ -93,12 +93,12 @@ class Camera(object):
         - Unify the intensity of the image to [0,1]
         """
         # self.image = cv2.medianBlur(self.image,3)
-        # print(self.image.max())
+
         self.image = self.image / np.max(self.image)
 
-def ren_camera_wrapper(it):
-    (x,y,camera,face_list,light_list) = it
-    print('rendering pixel x={}, y={}'.format(x,y))
+def ren_camera_wrapper(x,y,camera,face_list,light_list):
+    # (x,y,camera,face_list,light_list,arr,i) = it
+    print('\rrendering pixel x=%04d, y=%04d'%(x,y),end='')
     primary_halfline = camera.primary_halfline(x,y)
     ray_list = []
     point_all_list = []
@@ -135,14 +135,24 @@ def ren_camera(camera,face_list,light_list,num_proc = 1):
             camera.image[x][y] = cal_ray(ray_list)
     else:
         p = Pool(processes=num_proc)
-        res = p.map(ren_camera_wrapper,get_iter(camera,face_list,light_list))
-        i=0
+        res_list = []
+        # print(len(list(res_arr)))
+        # for x,y in itertools.pro
+        # res = p.map(ren_camera_wrapper,get_iter(camera,face_list,light_list))
         for x,y in itertools.product(range(camera.resolution[1]),range(camera.resolution[0])):
-            camera.image[x][y] = res[i]
-            i+=1
-        # print(camera.image.max())
+            # p.apply_async(ren_camera_wrapper,get_iter(camera,face_list,light_list,res_arr,i))
+            # print(x,y)
+            res_list.append(p.apply(ren_camera_wrapper,(x,y,camera,face_list,light_list)))
         p.close()
         p.join()
+        i=0
+        print('')
+        for x,y in itertools.product(range(camera.resolution[1]),range(camera.resolution[0])):
+            camera.image[x][y] = res_list[i].get()
+            print('\rgetting result:x=%04d,y=%04d' % (x,y),end='')
+            i+=1
+        print('')
+        # print(camera.image.max())
     camera.unify_intensity()
 
 
