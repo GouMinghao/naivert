@@ -1,10 +1,10 @@
-.. Geometry3D documentation master file, created by
+.. naivert documentation master file, created by
    sphinx-quickstart on Wed Apr 29 13:37:58 2020.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Geometry3D: 3D Computational Geometrics Library
-===============================================
+naivert: An Implementation For Ray Tracing Algorithm
+====================================================
 
 
 Python API

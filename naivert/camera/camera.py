@@ -98,7 +98,9 @@ class Camera(object):
 
 def ren_camera_wrapper(x,y,camera,face_list,light_list):
     # (x,y,camera,face_list,light_list,arr,i) = it
-    print('\rrendering pixel x=%04d, y=%04d'%(x,y),end='')
+    total = camera.resolution[0] * camera.resolution[1]
+    cur = x * camera.resolution[0] + y + 1
+    print(('\r[{}/{}] %.2f%% rendering pixel x={}, y={}' % (cur/total * 100,)).format(cur,total,x,y),end='')
     primary_halfline = camera.primary_halfline(x,y)
     ray_list = []
     point_all_list = []
@@ -125,7 +127,9 @@ def ren_camera(camera,face_list,light_list,num_proc = 1):
     """
     if num_proc == 1:
         for x,y in itertools.product(range(camera.resolution[1]),range(camera.resolution[0])):
-            print('rendering pixel x={}, y={}'.format(x,y))
+            total = camera.resolution[0] * camera.resolution[1]
+            cur = x * camera.resolution[0] + y + 1
+            print(('\r[{}/{}] %.2f%% rendering pixel x={}, y={}' % (cur/total * 100,)).format(cur,total,x,y),end='')
             primary_halfline = camera.primary_halfline(x,y)
             ray_list = []
             point_all_list = []
@@ -142,7 +146,7 @@ def ren_camera(camera,face_list,light_list,num_proc = 1):
         for x,y in itertools.product(range(camera.resolution[1]),range(camera.resolution[0])):
             # p.apply_async(ren_camera_wrapper,get_iter(camera,face_list,light_list,res_arr,i))
             # print(x,y)
-            res_list.append(p.apply(ren_camera_wrapper,(x,y,camera,face_list,light_list)))
+            res_list.append(p.apply_async(ren_camera_wrapper,(x,y,camera,face_list,light_list)))
         p.close()
         p.join()
         i=0
