@@ -11,7 +11,7 @@ def get_refraction_halfline(in_hl,in_n,out_n,cpg):
 
     - out_n: float of the outer material refraction rate
 
-    - cpg: Geometry3D.ConvexPolygen of the intersection convex polygen
+    - cpg: Geometry3D.ConvexPolygon of the intersection convex polygon
 
     **Output:**
 

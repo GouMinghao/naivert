@@ -7,7 +7,7 @@ def get_reflection_halfline(in_hl,cpg):
 
     - in_hl: Geometry3D.HalfLine of input half line.
 
-    - cpg: Geometry3D.ConvexPolygen of the intersection convex polygen
+    - cpg: Geometry3D.ConvexPolygon of the intersection convex polygon
 
     **Output:**
 

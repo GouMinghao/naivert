@@ -32,7 +32,7 @@ class Scene(object):
 
         - reverse_normal: boolean of whether reverse the normal of tha cpgs.
         '''
-        for cpg in cph.convex_polygens:
+        for cpg in cph.convex_polygons:
             if reverse_normal:
                 cpg = -cpg
             self.face_list.append(Face(cpg = cpg,material = material,is_isolated = False))
@@ -41,7 +41,7 @@ class Scene(object):
         '''
         **Input:**
 
-        - cpg: Geometry3D.ConvexPolygen of the cpg that is wanted to be added.
+        - cpg: Geometry3D.ConvexPolygon of the cpg that is wanted to be added.
 
         - material: Material of the material.
         '''

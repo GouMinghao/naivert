@@ -1,4 +1,4 @@
-Geometry3D==0.2.1
+Geometry3D==0.2.2
 numpy
 opencv-python
 matplotlib

@@ -5,7 +5,7 @@ class Face(object):
 
     **Input:**
 
-    - cpg: Geometry3D.ConvexPolygen
+    - cpg: Geometry3D.ConvexPolygon
 
     - material: Material class
 
