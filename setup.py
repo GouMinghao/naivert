@@ -12,7 +12,7 @@ setup(
         description="A Naive Ray Tracing Implementation",
         long_description=read("README.md"),
 
-        url="https://github.com/GouMinghao/naive-rt",
+        url="https://github.com/GouMinghao/naivert",
 
         author="Minghao Gou",
         author_email="gouminghao@gmail.com",

@@ -6,6 +6,11 @@
 naivert: An Implementation For Ray Tracing Algorithm
 ====================================================
 
+.. toctree::
+   :maxdepth: 1
+   
+   about
+   examples
 
 Python API
 ==========
